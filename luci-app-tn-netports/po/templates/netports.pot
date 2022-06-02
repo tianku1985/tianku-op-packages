@@ -1,0 +1,108 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: htdocs/luci-static/resources/netports.js:223
+#: htdocs/luci-static/resources/netports.js:236
+msgid "%1024.2mB"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:249
+msgid "Bridge member"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:364
+msgid "Collecting data..."
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:121
+msgctxt "Link status"
+msgid "Connected"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:137
+msgctxt "Link status"
+msgid "Disabled"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:130
+msgctxt "Link status"
+msgid "Disconnected"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:250
+msgid "Firewall zones"
+msgstr ""
+
+#: root/usr/share/rpcd/acl.d/netports.json:3
+msgid "Grant access to network ports status information"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:248
+msgid "Interface"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:247
+msgid "Link status"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:253
+msgid "MAC-address"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:119
+msgid "Mbit/s"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:246
+msgid "Name and MAC-address"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/status/include/25_netports.js:48
+msgid "Network Interfaces Ports Status"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:586
+msgid "No data to display"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:251
+msgid "RX"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:252
+msgid "TX"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:307
+msgid "Toggle additional information"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:320
+#: htdocs/luci-static/resources/netports.js:419
+msgid "Toggle view mode"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:410
+msgid "Too many ports for horizontal display mode"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:124
+msgid "full-duplex"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:126
+msgid "half-duplex"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:211
+msgid "none"
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:225
+#: htdocs/luci-static/resources/netports.js:238
+msgid "pkts."
+msgstr ""
+
+#: htdocs/luci-static/resources/netports.js:174
+msgid "port&#160;%d"
+msgstr ""
