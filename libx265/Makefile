@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=x265
-PKG_VERSION:=3.2.1
+PKG_VERSION:=2.8
 PKG_RELEASE:=0
 
 PKG_SOURCE:=$(PKG_NAME)_$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://ftp.videolan.org/pub/videolan/x265
 PKG_MAINTAINER:=CZ.NIC <packaging@turris.cz>
-PKG_HASH:=94808045a34d88a857e5eaf3f68f4bca
+PKG_HASH:=b68dcd4e8a495e53e53034a11fec5eb9
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)_$(PKG_VERSION)
 
 PKG_LICENSE:=GPL-2.0
