@@ -7,7 +7,7 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=tianku Theme 
-LUCI_DEPENDS:=+luci-app-n2n+luci-app-diskman
+LUCI_DEPENDS:=+luci-app-n2n +luci-app-diskman
 
 PKG_LICENSE:=Apache-2.0
 
