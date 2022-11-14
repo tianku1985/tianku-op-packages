@@ -12,7 +12,7 @@ LUCI_TITLE:=LuCI support for the Keepalived
 LUCI_DEPENDS:=+luci-base +keepalived +keepalived-sync
 LUCI_PKGARCH:=all
 
-include ../../luci.mk
+include $(TOPDIR)/feeds/luci/luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
 
