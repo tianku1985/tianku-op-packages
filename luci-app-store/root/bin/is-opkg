@@ -10,6 +10,7 @@ ARCH=`jsonfilter -i /etc/.app_store.id -e '$.arch'`
 
 # for istore self upgrade
 ISTORE_PKG=luci-app-store
+ISTORE_DEP_PKGS="luci-lib-taskd luci-lib-xterm taskd"
 ISTORE_INDEX=https://istore.linkease.com/repo/all/store/Packages.gz
 
 action=${1}
@@ -39,6 +40,15 @@ fcurl() {
     curl --fail --show-error "$@"
 }
 
+check_space() {
+    local free="$((`stat -c '%a * %S'  -f /` >> 20 ))"
+    if [ "$free" -lt 1 ]; then
+        echo "Root disk full!" >&2
+        exit 1
+    fi
+    return 0
+}
+
 update() {
     if [ -z "${ARCH}" ]; then
         echo "Get architecture failed" >&2
@@ -59,7 +69,7 @@ update() {
 
 update_if_outdate() {
     local idle_t=$((`date '+%s'` - `date -r ${IS_ROOT}/.last_force_ts '+%s' 2>/dev/null || echo '0'`))
-    [ $idle_t -gt ${1:-120} ] || return 1
+    [ $idle_t -gt ${1:-120} ] || return 2
     update || return 1
     touch ${IS_ROOT}/.last_force_ts
     return 0
@@ -78,14 +88,30 @@ check_self_upgrade() {
     return 0
 }
 
+do_self_upgrade_0() {
+    opkg_wrap upgrade ${ISTORE_DEP_PKGS} && opkg_wrap upgrade ${ISTORE_PKG}
+}
+
 do_self_upgrade() {
     check_mtime || return 1
-    if opkg_wrap info ${ISTORE_PKG} | grep -qF not-installed ; then
-        true
+    local newest=`curl --connect-timeout 2 --max-time 5 -s ${ISTORE_INDEX} | gunzip | grep -FA10 "Package: ${ISTORE_PKG}" | grep -Fm1 'Version: ' | sed 's/^Version: //'`
+    local current=`grep -Fm1 'Version: ' /usr/lib/opkg/info/${ISTORE_PKG}.control | sed 's/^Version: //'`
+    if [ "v$newest" = "v" -o "v$current" = "v" ]; then
+        echo "Check version failed!" >&2
+        return 1
+    fi
+    if [ "$newest" = "$current" ]; then
+        echo "Already the latest version!" >&2
+        return 1
+    fi
+    if opkg_wrap info ${ISTORE_PKG} | grep -qFm1 "Version: $newest"; then
+        do_self_upgrade_0 && return 0
+        update_if_outdate || return 1
+        do_self_upgrade_0
     else
         update_if_outdate || return 1
+        do_self_upgrade_0
     fi
-    opkg_wrap upgrade ${ISTORE_PKG}
 }
 
 check_mtime() {
@@ -94,9 +120,29 @@ check_mtime() {
 
 wrapped_in_update() {
     check_mtime || return 1
-    opkg_wrap "$@" && return 0
+    eval "$@" && return 0
     update_if_outdate || return 1
-    opkg_wrap "$@"
+    eval "$@"
+}
+
+step_upgrade() {
+    local pkg
+    local pkgs=""
+    local metapkg=""
+    for pkg in $@; do
+        if [[ $pkg == app-meta-* ]]; then
+            metapkg="$metapkg $pkg"
+        else
+            pkgs="$pkgs $pkg"
+        fi
+    done
+    if [ -n "$pkgs" ]; then
+        opkg_wrap upgrade $pkgs || return 1
+    fi
+    if [ -n "$metapkg" ]; then
+        opkg_wrap upgrade $metapkg || return 1
+    fi
+    return 0
 }
 
 new_upgrade() {
@@ -107,20 +153,25 @@ new_upgrade() {
     else
         update_if_outdate
     fi
-    wrapped_in_update upgrade "$@"
+    wrapped_in_update step_upgrade "$@"
+}
+
+remove() {
+    opkg_wrap --autoremove --force-removal-of-dependent-packages remove "$@"
 }
 
 usage() {
     echo "usage: is-opkg sub-command [arguments...]"
     echo "where sub-command is one of:"
-    echo "      update                  Update list of available packages"
-    echo "      upgrade <pkgs>          Upgrade package(s)"
-    echo "      install <pkgs>          Install package(s)"
-    echo "      remove <pkgs|regexp>    Remove package(s)"
-    echo "      info [pkg|regexp]       Display all info for <pkg>"
-    echo "      list-upgradable         List installed and upgradable packages"
-    echo "      check_self_upgrade      Check iStore upgrade"
-    echo "      do_self_upgrade         Upgrade iStore"
+    echo "      update                          Update list of available packages"
+    echo "      upgrade <pkgs>                  Upgrade package(s)"
+    echo "      install <pkgs>                  Install package(s)"
+    echo "      remove <pkgs|regexp>            Remove package(s)"
+    echo "      info [pkg|regexp]               Display all info for <pkg>"
+    echo "      list-upgradable                 List installed and upgradable packages"
+    echo "      check_self_upgrade              Check iStore upgrade"
+    echo "      do_self_upgrade                 Upgrade iStore"
+    echo "      opkg                            sys opkg wrap"
 }
 
 is_init >/dev/null 2>&1
@@ -130,13 +181,14 @@ case $action in
         update
     ;;
     "install")
-        wrapped_in_update install "$@"
+        check_space
+        wrapped_in_update opkg_wrap install "$@"
     ;;
     "upgrade")
         new_upgrade "$@"
     ;;
     "remove")
-        opkg_wrap --autoremove --force-removal-of-dependent-packages remove "$@"
+        remove "$@" || remove "$@"
     ;;
     "info")
         opkg_wrap info "$@"
@@ -148,8 +200,13 @@ case $action in
         check_self_upgrade
     ;;
     "do_self_upgrade")
+        check_space
         do_self_upgrade
     ;;
+    "opkg")
+        opkg_wrap "$@"
+    ;;
+
     *)
         usage
     ;;
