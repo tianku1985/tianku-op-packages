@@ -43,7 +43,7 @@ endef
 
 ifeq ($(CONFIG_SPEEDTEST_WEB_COMPRESS_GOPROXY),y)
 	export GO111MODULE=on
-	export GOPROXY=https://goproxy.baidu.com
+	export GOPROXY=https://goproxy.cn
 endif
 
 define Package/speedtest-web
